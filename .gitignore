@@ -1,0 +1,10 @@
+# Sistema y temporales
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+
+# Entornos y dependencias
+node_modules/
+.vscode/
+.idea/

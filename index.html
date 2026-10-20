@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VAPOR CLUB | Dashboard Logístico y Seguimiento de Entregas</title>
+  
+  <!-- Favicon Oficial -->
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+
+  <!-- Google Fonts: Montserrat (Titulares/Branding) & Inter (Data/UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="vapor-theme">
+
+  <!-- Ambient Glow Background Effects -->
+  <div class="ambient-glow glow-orange"></div>
+  <div class="ambient-glow glow-turquoise"></div>
+  <div class="ambient-glow glow-yellow"></div>
+
+  <!-- Header Section -->
+  <header class="dashboard-header">
+    <div class="header-container">
+      <div class="brand-block">
+        <div class="brand-logo-container">
+          <!-- Logo Oficial Vapor Club -->
+          <div class="logo-vapor-mark">
+            <img src="LOGO%20DE%20LA%20EMPRESA.jpg" alt="Vapor Club Logo Oficial" class="brand-logo-img">
+          </div>
+          <div class="brand-text">
+            <div class="brand-title">VAPOR <span class="text-orange">CLUB</span></div>
+            <div class="brand-subtitle">CONTROL LOGÍSTICO Y SEGUIMIENTO DE ENTREGAS</div>
+          </div>
+        </div>
+        <div class="live-status-pill">
+          <span class="live-pulse"></span>
+          <span class="live-text">ALMACÉN CENTRAL ACTIVO</span>
+          <span class="live-time" id="liveClock">--:--:--</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btnNewOrder" class="btn btn-primary" title="Registrar nuevo pedido en el sistema">
+          <i class="fa-solid fa-plus"></i>
+          <span>Nuevo Pedido</span>
+        </button>
+        <button id="btnExportCSV" class="btn btn-secondary" title="Exportar pedidos filtrados a Excel / CSV">
+          <i class="fa-solid fa-file-excel"></i>
+          <span>Exportar</span>
+        </button>
+        <button id="btnPrintReport" class="btn btn-secondary" title="Imprimir informe logístico en PDF">
+          <i class="fa-solid fa-print"></i>
+          <span>Imprimir</span>
+        </button>
+        <button id="btnResetData" class="btn btn-icon" title="Restablecer datos originales del Excel">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="dashboard-main">
+
+    <!-- KPI Section: 6 High-Impact Cards -->
+    <section class="kpi-grid" id="kpiSection">
+      
+      <!-- KPI 1: Total Pedidos -->
+      <div class="kpi-card card-glow-orange" data-kpi="total">
+        <div class="kpi-header">
+          <span class="kpi-title">TOTAL PEDIDOS</span>
+          <div class="kpi-icon-wrap icon-orange">
+            <i class="fa-solid fa-boxes-stacked"></i>
+          </div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiTotal">0</span>
+          <span class="kpi-tag tag-neutral" id="kpiTotalSub">Octubre 2026</span>
+        </div>
+        <div class="kpi-footer">
+          <i class="fa-solid fa-arrow-trend-up text-orange"></i>
+          <span class="kpi-foot-text">Pedidos procesados en periodo</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: On-Time Delivery % -->
+      <div class="kpi-card card-glow-turquoise" data-kpi="sla">
+        <div class="kpi-header">
+          <span class="kpi-title">CUMPLIMIENTO SLA</span>
+          <div class="kpi-icon-wrap icon-turquoise">
+            <i class="fa-solid fa-shield-check"></i>
+          </div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiSlaRate">0%</span>
+          <span class="kpi-tag tag-success" id="kpiSlaTag">Meta: ≥95%</span>
+        </div>
+        <div class="kpi-footer">
+          <div class="mini-progress-bar">
+            <div class="progress-fill fill-turquoise" id="kpiSlaBar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 3: Entregados con Éxito -->
+      <div class="kpi-card card-glow-green" data-kpi="delivered">
+        <div class="kpi-header">
+          <span class="kpi-title">ENTREGADOS</span>
+          <div class="kpi-icon-wrap icon-green">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiDelivered">0</span>
+          <span class="kpi-tag tag-success" id="kpiDeliveredPct">0%</span>
+        </div>
+        <div class="kpi-footer">
+          <i class="fa-solid fa-truck-ramp-box text-green"></i>
+          <span class="kpi-foot-text">Clientes recibieron conformidad</span>
+        </div>
+      </div>
+
+      <!-- KPI 4: En Ruta / Despachados -->
+      <div class="kpi-card card-glow-yellow" data-kpi="transit">
+        <div class="kpi-header">
+          <span class="kpi-title">EN RUTA / DESPACHO</span>
+          <div class="kpi-icon-wrap icon-yellow">
+            <i class="fa-solid fa-truck-fast"></i>
+          </div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiInTransit">0</span>
+          <span class="kpi-tag tag-warning">Transportistas</span>
+        </div>
+        <div class="kpi-footer">
+          <i class="fa-solid fa-route text-yellow"></i>
+          <span class="kpi-foot-text" id="kpiTransitSub">Con Italo B. / Motorizado</span>
+        </div>
+      </div>
+
+      <!-- KPI 5: En Preparación / Picking -->
+      <div class="kpi-card card-glow-orange" data-kpi="prep">
+        <div class="kpi-header">
+          <span class="kpi-title">EN PREPARACIÓN</span>
+          <div class="kpi-icon-wrap icon-orange">
+            <i class="fa-solid fa-dolly"></i>
+          </div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiInPrep">0</span>
+          <span class="kpi-tag tag-orange">En Almacén</span>
+        </div>
+        <div class="kpi-footer">
+          <i class="fa-solid fa-clipboard-check text-orange"></i>
+          <span class="kpi-foot-text">Picking & Packing activo</span>
+        </div>
+      </div>
+
+      <!-- KPI 6: Stock Incompleto / Alertas -->
+      <div class="kpi-card card-glow-red" data-kpi="issues">
+        <div class="kpi-header">
+          <span class="kpi-title">ALERTAS & STOCK</span>
+          <div class="kpi-icon-wrap icon-red">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiStockIssues">0</span>
+          <span class="kpi-tag tag-danger" id="kpiStockTag">Incompletos</span>
+        </div>
+        <div class="kpi-footer">
+          <i class="fa-solid fa-clock-rotate-left text-red"></i>
+          <span class="kpi-foot-text" id="kpiIssuesSub">Pendiente sedes VCG</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Navigation Views Tabs -->
+    <nav class="view-tabs">
+      <div class="tabs-container">
+        <button class="tab-btn active" data-view="analytics">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Analítica & Rendimiento</span>
+        </button>
+        <button class="tab-btn" data-view="pipeline">
+          <i class="fa-solid fa-diagram-project"></i>
+          <span>Pipeline de Despacho (Kanban)</span>
+        </button>
+        <button class="tab-btn" data-view="datagrid">
+          <i class="fa-solid fa-table-list"></i>
+          <span>Matriz de Seguimiento</span>
+          <span class="tab-counter" id="tabGridCount">0</span>
+        </button>
+        <button class="tab-btn" data-view="warehouse">
+          <i class="fa-solid fa-warehouse"></i>
+          <span>Operarios & Almacén</span>
+        </button>
+      </div>
+
+      <div class="quick-view-toggle">
+        <button id="toggleFiltersBtn" class="btn btn-secondary btn-sm" title="Mostrar/Ocultar barra de filtros">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Filtros Avanzados</span>
+          <span class="filter-active-indicator" id="filterActiveBadge" style="display:none">0</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Interactive Filter Toolbar -->
+    <section class="filters-panel" id="filtersPanel">
+      <div class="filters-grid">
+        
+        <!-- Search Input -->
+        <div class="filter-group filter-search">
+          <label><i class="fa-solid fa-magnifying-glass"></i> Buscar Pedido / Cliente / Doc</label>
+          <div class="search-input-wrap">
+            <input type="text" id="filterSearch" placeholder="Ej. F011-7296, Chávez, Cusco, 1..." autocomplete="off">
+            <button id="clearSearchBtn" class="clear-search-btn" style="display: none;">&times;</button>
+          </div>
+        </div>
+
+        <!-- Filter: Estado Final -->
+        <div class="filter-group">
+          <label><i class="fa-solid fa-circle-notch"></i> Estado Final</label>
+          <select id="filterStatus" class="form-select">
+            <option value="ALL">Todos los Estados</option>
+            <option value="ENTREGADO">Entregado</option>
+            <option value="EN RUTA">En Ruta / Despachado</option>
+            <option value="EN PREPARACION">En Preparación / Picking</option>
+            <option value="LISTO PARA RECOJO">Listo para Recojo</option>
+            <option value="INCIDENCIA">Incidencia / Alerta</option>
+          </select>
+        </div>
+
+        <!-- Filter: Prioridad / SLA -->
+        <div class="filter-group">
+          <label><i class="fa-solid fa-bolt"></i> Prioridad</label>
+          <select id="filterPriority" class="form-select">
+            <option value="ALL">Todas las Prioridades</option>
+            <option value="PRIORITARIO">Prioritario (&lt;5H / &lt;12H)</option>
+            <option value="24 H">24 Horas</option>
+            <option value="48 H">48 Horas</option>
+          </select>
+        </div>
+
+        <!-- Filter: Destino -->
+        <div class="filter-group">
+          <label><i class="fa-solid fa-location-dot"></i> Tipo de Destino</label>
+          <select id="filterDestination" class="form-select">
+            <option value="ALL">Todos los Destinos</option>
+            <option value="ALMACEN">Recojo en Almacén</option>
+            <option value="LIMA">Lima Metropolitana (Oficina / Domicilio)</option>
+            <option value="PROVINCIA">Provincias (Agencias / Domicilio)</option>
+          </select>
+        </div>
+
+        <!-- Filter: Vendedor -->
+        <div class="filter-group">
+          <label><i class="fa-solid fa-user-tie"></i> Vendedor</label>
+          <select id="filterSeller" class="form-select">
+            <option value="ALL">Todos los Vendedores</option>
+            <option value="FRANCISCO V.">FRANCISCO V.</option>
+            <option value="ORIANA S.">ORIANA S.</option>
+            <option value="LUCIA C.">LUCIA C.</option>
+          </select>
+        </div>
+
+        <!-- Filter: Stock -->
+        <div class="filter-group">
+          <label><i class="fa-solid fa-boxes-packing"></i> Stock</label>
+          <select id="filterStock" class="form-select">
+            <option value="ALL">Todos los Inventarios</option>
+            <option value="COMPLETO">Stock Completo</option>
+            <option value="INCOMPLETO">Stock Incompleto (Alertas)</option>
+          </select>
+        </div>
+
+        <!-- Filter: Fecha Rango -->
+        <div class="filter-group">
+          <label><i class="fa-solid fa-calendar-days"></i> Periodo</label>
+          <select id="filterDateRange" class="form-select">
+            <option value="ALL">Todo el Historial</option>
+            <option value="TODAY">Hoy (19 Octubre)</option>
+            <option value="OCT_WEEK">Semana Actual (15 - 19 Oct)</option>
+            <option value="OCT_MONTH" selected>Mes Octubre 2026</option>
+          </select>
+        </div>
+
+        <!-- Action: Reset Filters -->
+        <div class="filter-group filter-actions-cell">
+          <button id="btnResetFilters" class="btn btn-outline-warning w-100" title="Restablecer todos los filtros a sus valores predeterminados">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+            <span>Limpiar Filtros</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: ANALYTICS & CHARTS                     -->
+    <!-- ============================================== -->
+    <section class="view-content active" id="view-analytics">
+      
+      <div class="charts-grid">
+        
+        <!-- Chart 1: Despachos y Flujo en el Tiempo -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-title"><i class="fa-solid fa-chart-line text-orange"></i> Flujo Diario de Pedidos vs Despachos</h3>
+              <p class="chart-subtitle">Evolución de recepción y entrega de pedidos en octubre 2026</p>
+            </div>
+            <span class="badge badge-accent">OCTUBRE 2026</span>
+          </div>
+          <div class="chart-canvas-container">
+            <canvas id="chartDailyOrders"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Donut Distribución de Estados -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-title"><i class="fa-solid fa-chart-pie text-turquoise"></i> Estado Actual de Despachos</h3>
+              <p class="chart-subtitle">Proporción por fase operativa</p>
+            </div>
+            <span class="badge badge-turquoise">EN VIVO</span>
+          </div>
+          <div class="chart-canvas-container donut-container">
+            <canvas id="chartStatusDonut"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: Eficiencia por Vendedor -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-title"><i class="fa-solid fa-user-check text-yellow"></i> Rendimiento por Asesor Comercial</h3>
+              <p class="chart-subtitle">Volumen de pedidos y efectividad de entrega</p>
+            </div>
+            <span class="badge badge-warning">VENTAS</span>
+          </div>
+          <div class="chart-canvas-container">
+            <canvas id="chartSellers"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 4: Destinos y Tiempos de Entrega -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-title"><i class="fa-solid fa-map-location-dot text-orange"></i> Distribución de Pedidos por Destino</h3>
+              <p class="chart-subtitle">Lima Almacén / Oficina vs Agencias de Provincia</p>
+            </div>
+            <span class="badge badge-neutral">LOGÍSTICA</span>
+          </div>
+          <div class="chart-canvas-container">
+            <canvas id="chartDestinations"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Observaciones Feed -->
+      <div class="incidents-feed-card">
+        <div class="feed-header">
+          <div class="feed-title">
+            <i class="fa-solid fa-bell-concierge text-orange"></i>
+            <span>BITÁCORA OPERATIVA & OBSERVACIONES EN TIEMPO REAL</span>
+          </div>
+          <span class="feed-tag">NOTAS DE ALMACÉN</span>
+        </div>
+        <div class="feed-list" id="feedListContainer">
+          <!-- Dynamic Feed Items inserted via JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: PIPELINE LOGÍSTICO (KANBAN BOARD)       -->
+    <!-- ============================================== -->
+    <section class="view-content" id="view-pipeline">
+      <div class="pipeline-intro">
+        <p><i class="fa-solid fa-arrows-turn-to-dots text-orange"></i> <strong>Flujo Operativo de Vapor Club:</strong> Arrastra o interactúa con los pedidos para conocer la trazabilidad desde su validación hasta la entrega final al cliente.</p>
+      </div>
+
+      <div class="kanban-board" id="kanbanBoard">
+        
+        <!-- Column 1: Validado / Por Iniciar -->
+        <div class="kanban-column" data-status="VALIDADO">
+          <div class="column-header col-validado">
+            <div class="col-title-wrap">
+              <span class="col-dot dot-cyan"></span>
+              <h4>1. VALIDADO</h4>
+            </div>
+            <span class="col-count" id="count-validado">0</span>
+          </div>
+          <div class="column-cards" id="cards-validado"></div>
+        </div>
+
+        <!-- Column 2: Picking -->
+        <div class="kanban-column" data-status="PICKING">
+          <div class="column-header col-picking">
+            <div class="col-title-wrap">
+              <span class="col-dot dot-yellow"></span>
+              <h4>2. EN PICKING</h4>
+            </div>
+            <span class="col-count" id="count-picking">0</span>
+          </div>
+          <div class="column-cards" id="cards-picking"></div>
+        </div>
+
+        <!-- Column 3: Packing -->
+        <div class="kanban-column" data-status="PACKING">
+          <div class="column-header col-packing">
+            <div class="col-title-wrap">
+              <span class="col-dot dot-orange"></span>
+              <h4>3. EN PACKING</h4>
+            </div>
+            <span class="col-count" id="count-packing">0</span>
+          </div>
+          <div class="column-cards" id="cards-packing"></div>
+        </div>
+
+        <!-- Column 4: En Ruta -->
+        <div class="kanban-column" data-status="EN RUTA">
+          <div class="column-header col-enruta">
+            <div class="col-title-wrap">
+              <span class="col-dot dot-blue"></span>
+              <h4>4. CON TRANSPORTISTA</h4>
+            </div>
+            <span class="col-count" id="count-enruta">0</span>
+          </div>
+          <div class="column-cards" id="cards-enruta"></div>
+        </div>
+
+        <!-- Column 5: Entregado -->
+        <div class="kanban-column" data-status="ENTREGADO">
+          <div class="column-header col-entregado">
+            <div class="col-title-wrap">
+              <span class="col-dot dot-green"></span>
+              <h4>5. ENTREGADO</h4>
+            </div>
+            <span class="col-count" id="count-entregado">0</span>
+          </div>
+          <div class="column-cards" id="cards-entregado"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 3: MATRIZ DE SEGUIMIENTO (DATA GRID PRO)   -->
+    <!-- ============================================== -->
+    <section class="view-content" id="view-datagrid">
+      
+      <div class="table-container-card">
+        
+        <div class="table-card-header">
+          <div class="table-header-left">
+            <h3 class="table-title"><i class="fa-solid fa-list-check text-orange"></i> Matriz Completa de Despachos</h3>
+            <span class="table-meta" id="tableFilterMeta">Mostrando todos los pedidos</span>
+          </div>
+
+          <div class="table-header-right">
+            <div class="table-badge-summary">
+              <span class="badge-dot-label"><span class="dot dot-green"></span> Entregado</span>
+              <span class="badge-dot-label"><span class="dot dot-yellow"></span> En Ruta</span>
+              <span class="badge-dot-label"><span class="dot dot-orange"></span> En Prep</span>
+              <span class="badge-dot-label"><span class="dot dot-red"></span> Alerta Stock</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Interactive Responsive Table -->
+        <div class="table-responsive">
+          <table class="vapor-table" id="ordersTable">
+            <thead>
+              <tr>
+                <th data-sort="numPedido">Nº <i class="fa-solid fa-sort"></i></th>
+                <th data-sort="fechaPedido">FECHA / HORA <i class="fa-solid fa-sort"></i></th>
+                <th data-sort="docsRelacionados">DOCS. RELACIONADOS <i class="fa-solid fa-sort"></i></th>
+                <th data-sort="cliente">CLIENTE <i class="fa-solid fa-sort"></i></th>
+                <th data-sort="vendedor">VENDEDOR <i class="fa-solid fa-sort"></i></th>
+                <th data-sort="destino">DESTINO <i class="fa-solid fa-sort"></i></th>
+                <th data-sort="prioridad">PRIORIDAD <i class="fa-solid fa-sort"></i></th>
+                <th>OPERARIOS (PICK/PACK)</th>
+                <th data-sort="stockCompleto">STOCK</th>
+                <th data-sort="estadoFinal">ESTADO FINAL <i class="fa-solid fa-sort"></i></th>
+                <th data-sort="sla">SLA</th>
+                <th>ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer / Pagination -->
+        <div class="table-footer">
+          <div class="table-pagination-info" id="paginationInfo">
+            Mostrando 1 - 10 de 12 pedidos
+          </div>
+          <div class="table-pagination-controls" id="paginationControls">
+            <!-- Dynamic pagination buttons -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 4: RENDIMIENTO ALMACÉN & OPERARIOS         -->
+    <!-- ============================================== -->
+    <section class="view-content" id="view-warehouse">
+      
+      <div class="warehouse-grid">
+        
+        <!-- Operadores Picking & Packing -->
+        <div class="warehouse-card">
+          <div class="warehouse-card-header">
+            <h4><i class="fa-solid fa-users-gear text-orange"></i> Productividad de Operarios de Almacén</h4>
+            <span class="badge badge-accent">EQUIPO LOGÍSTICO</span>
+          </div>
+          <div class="operators-table-wrap">
+            <table class="operator-table">
+              <thead>
+                <tr>
+                  <th>OPERARIO</th>
+                  <th>TAREAS PICKING</th>
+                  <th>TAREAS PACKING</th>
+                  <th>TOTAL PROCESADOS</th>
+                  <th>ESTADO</th>
+                </tr>
+              </thead>
+              <tbody id="operatorsTableBody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Validación y Control de Calidad -->
+        <div class="warehouse-card">
+          <div class="warehouse-card-header">
+            <h4><i class="fa-solid fa-clipboard-check text-turquoise"></i> Supervisor & Control de Validación</h4>
+            <span class="badge badge-turquoise">CALIDAD</span>
+          </div>
+          <div class="validation-summary-box">
+            <div class="supervisor-profile">
+              <div class="supervisor-avatar">
+                <i class="fa-solid fa-user-shield"></i>
+              </div>
+              <div class="supervisor-info">
+                <div class="supervisor-name">Rafael L.</div>
+                <div class="supervisor-role">Jefe de Validación & Control de Despachos</div>
+                <div class="supervisor-stat">Tasa de validación efectiva: <strong>100%</strong></div>
+              </div>
+            </div>
+            
+            <div class="validation-metrics">
+              <div class="val-metric-item">
+                <span class="val-label">Pedidos Validados</span>
+                <span class="val-num text-turquoise" id="valValidCount">11</span>
+              </div>
+              <div class="val-metric-item">
+                <span class="val-label">Stock Completo</span>
+                <span class="val-num text-green" id="valStockOkCount">10</span>
+              </div>
+              <div class="val-metric-item">
+                <span class="val-label">Quiebres / Sedes VCG</span>
+                <span class="val-num text-red" id="valStockFailCount">2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flota y Transportistas -->
+        <div class="warehouse-card">
+          <div class="warehouse-card-header">
+            <h4><i class="fa-solid fa-truck-moving text-yellow"></i> Canales de Transporte & Courier</h4>
+            <span class="badge badge-warning">DESPACHO</span>
+          </div>
+          <div class="couriers-list" id="couriersList">
+            <!-- Dynamic couriers injected via JS -->
+          </div>
+        </div>
+
+        <!-- Protocolo Logístico y Horarios -->
+        <div class="warehouse-card">
+          <div class="warehouse-card-header">
+            <h4><i class="fa-solid fa-business-time text-orange"></i> Protocolos de Atención & Horarios</h4>
+            <span class="badge badge-neutral">NORMATIVA</span>
+          </div>
+          <div class="warehouse-rules-list">
+            <div class="rule-item">
+              <i class="fa-solid fa-clock text-orange"></i>
+              <div>
+                <strong>Horario de Almacén:</strong> Lunes a Viernes 08:30 a 18:00 hrs. Sábados 09:00 a 14:00 hrs.
+              </div>
+            </div>
+            <div class="rule-item">
+              <i class="fa-solid fa-triangle-exclamation text-yellow"></i>
+              <div>
+                <strong>Cortes de Pedidos:</strong> Pedidos recibidos después de las 17:30 pasan a preparación al día hábil siguiente.
+              </div>
+            </div>
+            <div class="rule-item">
+              <i class="fa-solid fa-boxes-stacked text-turquoise"></i>
+              <div>
+                <strong>Traslados Sedes VCG:</strong> Mercadería incompleta debe coordinarse antes de las 13:00 para cumplir SLA 48H.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL: DETALLES COMPLETOS DEL PEDIDO           -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop" id="orderDetailModal">
+    <div class="modal-card modal-lg">
+      
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-badge-id" id="modalOrderId">PED-2026-001</span>
+          <h3 id="modalClientName">Nombre del Cliente</h3>
+        </div>
+        <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+      </div>
+
+      <div class="modal-body" id="modalDetailBody">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalPrintOrderBtn">
+          <i class="fa-solid fa-print"></i> Imprimir Guía / Ticket
+        </button>
+        <button class="btn btn-primary" id="modalCloseBtnFooter">
+          Entendido
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: REGISTRAR NUEVO PEDIDO                  -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop" id="newOrderModal">
+    <div class="modal-card modal-md">
+      
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge"><i class="fa-solid fa-box-open"></i></div>
+          <div>
+            <h3>Registrar Nuevo Pedido Logístico</h3>
+            <p class="modal-sub">Ingreso directo al sistema de seguimiento de Vapor Club</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="newOrderCloseBtn">&times;</button>
+      </div>
+
+      <form id="newOrderForm" class="modal-form">
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label>Nº Pedido (Correlativo) *</label>
+            <input type="text" id="formNumPedido" required placeholder="Ej. 6">
+          </div>
+          <div class="form-group col-6">
+            <label>Documento Relacionado *</label>
+            <input type="text" id="formDoc" required placeholder="Ej. F011-7315 / T011-3770">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-8">
+            <label>Cliente (Razón Social o Persona) *</label>
+            <input type="text" id="formCliente" required placeholder="Nombre completo del cliente">
+          </div>
+          <div class="form-group col-4">
+            <label>Vendedor *</label>
+            <select id="formVendedor" required class="form-select">
+              <option value="FRANCISCO V.">FRANCISCO V.</option>
+              <option value="ORIANA S.">ORIANA S.</option>
+              <option value="LUCIA C.">LUCIA C.</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label>Destino de Entrega *</label>
+            <input type="text" id="formDestino" required placeholder="Ej. AGENCIA-CUSCO o OFICINA-SAN ISIDRO">
+          </div>
+          <div class="form-group col-3">
+            <label>Tipo *</label>
+            <select id="formTipoDestino" required class="form-select">
+              <option value="PROVINCIA">Provincia</option>
+              <option value="LIMA">Lima Local</option>
+              <option value="ALMACEN">Recojo Almacén</option>
+            </select>
+          </div>
+          <div class="form-group col-3">
+            <label>Prioridad *</label>
+            <select id="formPrioridad" required class="form-select">
+              <option value="PRIORITARIO">Prioritario (&lt;12H)</option>
+              <option value="24 H">24 Horas</option>
+              <option value="48 H" selected>48 Horas</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-4">
+            <label>Operario Picking</label>
+            <select id="formPicking" class="form-select">
+              <option value="Yampier G.">Yampier G.</option>
+              <option value="Gsús U.">Gsús U.</option>
+              <option value="Gerardo V.">Gerardo V.</option>
+              <option value="Rafael L.">Rafael L.</option>
+            </select>
+          </div>
+          <div class="form-group col-4">
+            <label>Operario Packing</label>
+            <select id="formPacking" class="form-select">
+              <option value="Gsús U.">Gsús U.</option>
+              <option value="Yampier G.">Yampier G.</option>
+              <option value="Gerardo V.">Gerardo V.</option>
+              <option value="Pendiente">Pendiente</option>
+            </select>
+          </div>
+          <div class="form-group col-4">
+            <label>Stock Inicial</label>
+            <select id="formStock" class="form-select">
+              <option value="COMPLETO">COMPLETO</option>
+              <option value="INCOMPLETO">INCOMPLETO</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label>Transportista Asignado</label>
+            <select id="formTransportista" class="form-select">
+              <option value="Italo B.">Italo B.</option>
+              <option value="REC. ALM.">REC. ALM.</option>
+              <option value="MOTORIZADO EXPRESS">MOTORIZADO EXPRESS</option>
+            </select>
+          </div>
+          <div class="form-group col-6">
+            <label>Estado Inicial</label>
+            <select id="formEstado" class="form-select">
+              <option value="EN PREPARACION">EN PREPARACIÓN</option>
+              <option value="EN RUTA">EN RUTA</option>
+              <option value="LISTO PARA RECOJO">LISTO PARA RECOJO</option>
+              <option value="ENTREGADO">ENTREGADO</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Observaciones Operativas</label>
+          <textarea id="formObs" rows="2" placeholder="Notas sobre horario, coordinaciones especiales, stock, etc."></textarea>
+        </div>
+
+        <div class="modal-form-actions">
+          <button type="button" class="btn btn-secondary" id="cancelNewOrderBtn">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Pedido</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- FLOATING SMART TOOLTIP ELEMENT -->
+  <div class="smart-floating-tooltip" id="smartTooltip">
+    <!-- Populated dynamically via JS on hover -->
+  </div>
+
+  <!-- Audio feedback effects (optional Web Audio API generated sounds) -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
