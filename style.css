@@ -1669,42 +1669,305 @@ body.vapor-theme {
 }
 
 /* ==========================================================================
-   Responsive Adaptations
+   Responsive Adaptations (Tablet, Mobile & Small Screens)
    ========================================================================== */
-@media (max-width: 1200px) {
+
+/* Tablet & Medium Screens (<= 1024px) */
+@media (max-width: 1024px) {
+  .dashboard-header {
+    padding: 0.85rem 1.25rem;
+  }
+  .dashboard-main {
+    padding: 1.25rem 1.25rem 3rem 1.25rem;
+  }
   .charts-grid {
     grid-template-columns: 1fr;
   }
   .filters-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-  .kanban-board {
-    grid-template-columns: repeat(3, 1fr);
-    overflow-x: auto;
-  }
   .warehouse-grid {
     grid-template-columns: 1fr;
   }
 }
 
+/* Mobile Screens (<= 768px) */
 @media (max-width: 768px) {
+  /* Header & Navigation */
   .dashboard-header {
     padding: 0.75rem 1rem;
   }
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+  .brand-block {
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.75rem;
+  }
+  .brand-logo-container {
+    gap: 0.75rem;
+  }
+  .logo-vapor-mark {
+    width: 44px;
+    height: 44px;
+  }
+  .brand-title {
+    font-size: 1.25rem;
+  }
+  .brand-subtitle {
+    font-size: 0.6rem;
+    letter-spacing: 0.8px;
+  }
+  .live-status-pill {
+    padding: 0.25rem 0.6rem;
+    gap: 0.4rem;
+  }
+  .live-text {
+    font-size: 0.65rem;
+  }
+  .live-time {
+    font-size: 0.65rem;
+  }
+
+  /* Action Buttons bar */
+  .header-actions {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    gap: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .header-actions::-webkit-scrollbar {
+    display: none;
+  }
+  .header-actions .btn {
+    flex: 1 1 auto;
+    min-height: 40px;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+    justify-content: center;
+  }
+
+  /* Main Container */
   .dashboard-main {
-    padding: 1rem 1rem 3rem 1rem;
+    padding: 0.85rem 0.85rem 3rem 0.85rem;
+  }
+
+  /* KPI Cards Grid: 2 Columns on Mobile */
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .kpi-card {
+    padding: 0.95rem 1rem;
+    border-radius: var(--radius-md);
+  }
+  .kpi-title {
+    font-size: 0.68rem;
+  }
+  .kpi-icon-wrap {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
+  }
+  .kpi-value {
+    font-size: 1.55rem;
+  }
+  .kpi-tag {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+  }
+  .kpi-footer {
+    font-size: 0.68rem;
+    gap: 0.35rem;
+  }
+
+  /* View Tabs: Horizontal Swipe with Touch Momentum */
+  .view-tabs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+  .tabs-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .tabs-container::-webkit-scrollbar {
+    display: none;
+  }
+  .tab-btn {
+    font-size: 0.78rem;
+    padding: 0.55rem 0.9rem;
+    min-height: 40px;
+  }
+  .quick-view-toggle .btn {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  /* Filter Toolbar */
+  .filters-panel {
+    padding: 1rem;
+    border-radius: var(--radius-md);
   }
   .filters-grid {
     grid-template-columns: 1fr;
+    gap: 0.8rem;
   }
+  .search-input-wrap input,
+  .form-select,
+  .filter-actions-cell .btn {
+    min-height: 44px;
+    font-size: 0.88rem;
+  }
+
+  /* Charts */
+  .chart-card {
+    padding: 1rem;
+    border-radius: var(--radius-md);
+  }
+  .chart-canvas-container {
+    height: 220px;
+  }
+  .chart-canvas-container.donut-container {
+    height: 210px;
+  }
+
+  /* Kanban: Horizontal Touch-Snap Carousel */
   .kanban-board {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 0.9rem;
+    padding-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .kanban-column {
+    flex: 0 0 82%;
+    min-width: 270px;
+    max-width: 320px;
+    scroll-snap-align: start;
+    max-height: 600px;
+  }
+
+  /* Table / Data Grid */
+  .table-container-card {
+    border-radius: var(--radius-md);
+  }
+  .table-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+  .table-badge-summary {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+  .vapor-table th, .vapor-table td {
+    padding: 0.75rem 0.8rem;
+  }
+  .table-footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    padding: 0.85rem 1rem;
+  }
+
+  /* Feed bitácora */
+  .feed-list {
     grid-template-columns: 1fr;
+  }
+
+  /* Detail & Form Modals */
+  .modal-backdrop {
+    padding: 0.75rem;
+    align-items: flex-end;
+  }
+  .modal-card {
+    max-height: 88vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+  .modal-header, .modal-footer {
+    padding: 1rem 1.15rem;
+  }
+  .modal-body, .modal-form {
+    padding: 1.15rem;
   }
   .order-detail-grid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
   .form-row {
     flex-direction: column;
+    gap: 0.75rem;
+  }
+  .col-3, .col-4, .col-6, .col-8 {
+    flex: 1 1 100%;
+  }
+
+  /* Timeline Flow in Modal */
+  .timeline-flow {
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    justify-content: center;
+    margin: 1rem 0;
+  }
+  .timeline-flow::before {
+    display: none;
+  }
+  .timeline-step {
+    flex: 0 0 30%;
+  }
+}
+
+/* Small Smartphone Screens (<= 420px) */
+@media (max-width: 420px) {
+  .brand-title {
+    font-size: 1.1rem;
+  }
+  .brand-subtitle {
+    display: none;
+  }
+  .live-status-pill {
+    padding: 0.2rem 0.45rem;
+  }
+  .live-time {
+    display: none;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.55rem;
+  }
+  .kpi-card {
+    padding: 0.8rem;
+  }
+  .kpi-value {
+    font-size: 1.35rem;
+  }
+  .kpi-title {
+    font-size: 0.64rem;
+  }
+  .kpi-foot-text {
+    font-size: 0.66rem;
+  }
+  .header-actions .btn span {
+    font-size: 0.75rem;
   }
 }
 
